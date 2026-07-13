@@ -9,8 +9,8 @@ ARG OSNAME=octopus
 # ==========================================
 # 2. HYPRLAND, HARDENED KERNEL & SYSTEM CORE
 # ==========================================
-RUN dnf -y install dnf5-plugins-core || dnf -y install 'dnf-command(copr)' && \
-    dnf -y copr enable turing/kernel-hardened && \
+RUN dnf -y install dnf5-plugins-core && \
+    dnf copr enable -y turing/kernel-hardened && \
     dnf -y install \
         kernel-hardened \
         kernel-hardened-modules \
