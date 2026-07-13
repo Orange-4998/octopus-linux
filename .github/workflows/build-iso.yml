@@ -7,7 +7,6 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   build-and-push:
@@ -19,6 +18,12 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      # --- THE FIX: Lowercase the repository name ---
+      - name: Downcase IMAGE_NAME
+        id: string
+        run: |
+          echo "IMAGE_NAME=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
 
       - name: Log in to the Container registry
         uses: docker/login-action@v3
@@ -34,6 +39,7 @@ jobs:
           context: .
           file: ./Containerfile
           push: true
+          # Uses the clean lowercase variable we generated above
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
 
       # Step 2: Convert the container into a bootable installer ISO
