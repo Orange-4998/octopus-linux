@@ -12,14 +12,13 @@ ARG OSNAME=octopus
 # 1. Install native DNF5 plugins to unlock repository management.
 # 2. Feed the official upstream Fedora 44 and updates repo configuration files directly to DNF5.
 # 3. Layer strictly authorized user-space utilities and let DNF resolve the deep graphical dependencies.
-RUN dnf -y install dnf5-plugins && \
-    dnf config-manager addrepo --from-repofile=https://src.fedoraproject.org/rpms/fedora-repos/raw/f44/f/fedora.repo && \
-    dnf config-manager addrepo --from-repofile=https://src.fedoraproject.org/rpms/fedora-repos/raw/f44/f/fedora-updates.repo && \
-    dnf -y install \
+RUN dnf -y clean all && dnf -y makecache && \
+    dnf -y install --allowerasing \
+    	# Compositor & UI Shell
         hyprland \
         kitty \
         waybar \
-        fish \
+        fish \ 
         distrobox \
         ansible-core \
         clevis clevis-dracut cryptsetup \
