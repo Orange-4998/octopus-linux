@@ -10,8 +10,7 @@ ARG OSNAME=octopus
 # 2. HYPRLAND, HARDENED KERNEL & SYSTEM CORE
 # ==========================================
 RUN dnf -y install fedora-repos-archive && \
-    dnf config-manager --set-enabled fedora,updates && \ 
-    dnf -y install \
+    dnf -y --enablerepo=fedora,updates install \
         hyprland \
         kitty \
         waybar \
