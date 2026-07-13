@@ -12,8 +12,7 @@ ARG OSNAME=octopus
 # 1. Install native DNF5 plugins to unlock repository management.
 # 2. Feed the official upstream Fedora 44 and updates repo configuration files directly to DNF5.
 # 3. Layer strictly authorized user-space utilities and let DNF resolve the deep graphical dependencies.
-RUN dnf -y clean all && dnf -y makecache && \
-    dnf -y install --allowerasing \
+RUN dnf -y install \
     	# Compositor & UI Shell
         hyprland \
         kitty \
