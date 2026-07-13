@@ -9,7 +9,8 @@ ARG OSNAME=octopus
 # ==========================================
 # 2. HYPRLAND, HARDENED KERNEL & SYSTEM CORE
 # ==========================================
-RUN dnf -y install \
+RUN dnf -y install fedora-release-identity-workstation && \
+    dnf -y install \
         hyprland \
         kitty \
         waybar \
