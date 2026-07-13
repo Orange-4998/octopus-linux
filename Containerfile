@@ -7,24 +7,15 @@ FROM quay.io/fedora/fedora-bootc:44
 ARG OSNAME=octopus
 
 # ==========================================
-# 2. HYPRLAND, HARDENED KERNEL & SYSTEM CORE
+# 2. HYPRLAND, NATIVE HARDENING & SYSTEM CORE
 # ==========================================
-
-RUN echo -e "[fedora-everything]\n\
-name=Fedora 44 - Everything\n\
-metalink=https://mirrors.fedoraproject.org/metalink?repo=fedora-44&arch=\$basearch\n\
-enabled=1\n\
-gpgcheck=1\n\
-gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-44-\$basearch\n\
-\n\
-[fedora-updates]\n\
-name=Fedora 44 - Updates\n\
-metalink=https://mirrors.fedoraproject.org/metalink?repo=updates-released-f44&arch=\$basearch\n\
-enabled=1\n\
-gpgcheck=1\n\
-gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-44-\$basearch" > /etc/yum.repos.d/octopus-temp.repo
-
-RUN dnf -y install \
+# 1. Install native DNF5 plugins to unlock repository management.
+# 2. Feed the official upstream Fedora 44 and updates repo configuration files directly to DNF5.
+# 3. Layer strictly authorized user-space utilities and let DNF resolve the deep graphical dependencies.
+RUN dnf -y install dnf5-plugins && \
+    dnf config-manager addrepo --from-repofile=https://src.fedoraproject.org/rpms/fedora-repos/raw/f44/f/fedora.repo && \
+    dnf config-manager addrepo --from-repofile=https://src.fedoraproject.org/rpms/fedora-repos/raw/f44/f/fedora-updates.repo && \
+    dnf -y install \
         hyprland \
         kitty \
         waybar \
@@ -49,8 +40,6 @@ RUN mkdir -p /home/box-data /data && \
 # ==========================================
 # 4. IMMUTABLE SYSTEMD BLAST-DOOR MOUNTS
 # ==========================================
-# File paths must explicitly map to the mount destinations (hyphens for slashes)
-
 # --- /home Mount (ext4) ---
 RUN echo -e "[Unit]\n\
 Description=User Space Home Directory (/home)\n\
