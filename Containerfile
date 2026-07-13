@@ -12,7 +12,20 @@ ARG OSNAME=octopus
 # 1. Install native DNF5 plugins to unlock repository management.
 # 2. Feed the official upstream Fedora 44 and updates repo configuration files directly to DNF5.
 # 3. Layer strictly authorized user-space utilities and let DNF resolve the deep graphical dependencies.
+RUN dnf -y install 'dnf5-command(copr)'
 
+RUN dnf -y copr enable lionheartp/Hyprland
+
+RUN dnf -y install \
+    	# Compositor & UI Shell
+        hyprland \
+        kitty \
+        waybar \
+        fish \ 
+        distrobox \
+        ansible-core \
+        clevis clevis-dracut cryptsetup \
+    && dnf clean all
 
 # ==========================================
 # 3. USER SETUP
