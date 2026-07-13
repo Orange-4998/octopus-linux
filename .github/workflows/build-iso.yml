@@ -1,0 +1,52 @@
+name: Build Octopus Linux ISO
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Step 1: Build the container blueprint image
+      - name: Build and push Container image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Containerfile
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+
+      # Step 2: Convert the container into a bootable installer ISO
+      - name: Build Bootable ISO
+        uses: osbuild/bootc-image-builder-action@main
+        with:
+          image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          config-file: config.toml
+          types: anaconda-iso
+
+      # Step 3: Upload the built ISO so users can download it from GitHub
+      - name: Upload ISO Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: octopus-linux-installer-iso
+          path: ${{ github.workspace }}/output/anaconda-iso/install.iso
