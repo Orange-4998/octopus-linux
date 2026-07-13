@@ -9,8 +9,8 @@ ARG OSNAME=octopus
 # ==========================================
 # 2. HYPRLAND, HARDENED KERNEL & SYSTEM CORE
 # ==========================================
-RUN dnf -y install https://mirrors.fedoraproject.org/metalink?repo=fedora-44\&arch=x86_64 || \
-    dnf -y install fedora-repos && \
+RUN curl -Lo /etc/yum.repos.d/fedora.repo https://src.fedoraproject.org/rpms/fedora-repos/raw/f44/f/fedora.repo && \
+    curl -Lo /etc/yum.repos.d/fedora-updates.repo https://src.fedoraproject.org/rpms/fedora-repos/raw/f44/f/fedora-updates.repo && \
     dnf -y install \
         hyprland \
         kitty \
