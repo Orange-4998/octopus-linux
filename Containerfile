@@ -9,11 +9,7 @@ ARG OSNAME=octopus
 # ==========================================
 # 2. HYPRLAND, HARDENED KERNEL & SYSTEM CORE
 # ==========================================
-RUN dnf -y install dnf5-plugins-core && \
-    dnf copr enable -y turing/kernel-hardened && \
-    dnf -y install \
-        kernel-hardened \
-        kernel-hardened-modules \
+RUN dnf -y install \
         hyprland \
         kitty \
         waybar \
@@ -22,9 +18,6 @@ RUN dnf -y install dnf5-plugins-core && \
         ansible-core \
         clevis clevis-dracut clevis-systemd cryptsetup \
     && dnf clean all
-
-# Force the system to prioritize the hardened kernel on boot
-RUN echo "UPDATER_DEFAULT_KERNEL=kernel-hardened" >> /etc/sysconfig/kernel
 
 # ==========================================
 # 3. USER SETUP
@@ -66,7 +59,7 @@ ConditionPathExists=/data\n\
 What=LABEL=${OSNAME}-DATA\n\
 Where=/data\n\
 Type=btrfs\n\
-Options=defaults,noexec,nosuid,nodev,discard=async,workqueue=0\n\
+Options=defaults,noexec,nosuid,nodev,discard=async\n\
 \n\
 [Install]\n\
 WantedBy=multi-user.target" > /usr/lib/systemd/system/data.mount
@@ -81,3 +74,10 @@ ARG IMAGE_URL=ghcr.io/orange-4998/octopus-linux:latest
 RUN mkdir -p /usr/lib/bootc/bound-images.d && \
     echo "io.containers.bootc.clonable=true" > /usr/lib/bootc/bound-images.d/octopus.conf && \
     echo "image = \"$IMAGE_URL\"" >> /usr/lib/bootc/bound-images.d/octopus.conf
+
+# ==========================================
+# 6. ADVANCED KERNEL HARDENING VIA KARGS
+# ==========================================
+# Baked directly into a single, cohesive line inside the bootc kargs registry.
+RUN mkdir -p /usr/lib/bootc/kargs.d && \
+    echo 'init_on_alloc=1 init_on_free=1 page_alloc.shuffle=1 slab_nomerge vsyscall=none randomize_kstack_offset=on intel_iommu=on amd_iommu=on iommu=strict efi=disable_early_pci_dma lockdown=integrity' > /usr/lib/bootc/kargs.d/00-octopus-hardening.conf
