@@ -4,20 +4,20 @@
 # ==============================================================================
 
 # 1. The mandatory root partition (Fedora bootc uses ext4 by default for plain)
-[[customizations.partitioning.plain.filesystems]]
+[[customizations.filesystems]]
 mountpoint = "/"
 type = "btrfs"
 minsize = "15 GiB"
 
 # 2. Your custom Home partition matching: LABEL=octopus-HOME
-[[customizations.partitioning.plain.filesystems]]
+[[customizations.filesystems]]
 mountpoint = "/home"
 type = "ext4"
 minsize = "10 GiB"
 label = "octopus-HOME"
 
 # 3. Your custom Data partition matching: LABEL=octopus-DATA
-[[customizations.partitioning.plain.filesystems]]
+[[customizations.filesystems]]
 mountpoint = "/data"
 type = "btrfs"
 minsize = "20 GiB"
