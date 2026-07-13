@@ -22,7 +22,7 @@ RUN dnf -y install dnf5-plugins && \
         fish \
         distrobox \
         ansible-core \
-        clevis clevis-dracut clevis-systemd cryptsetup \
+        clevis clevis-dracut cryptsetup \
     && dnf clean all
 
 # ==========================================
