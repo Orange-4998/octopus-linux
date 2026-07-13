@@ -9,9 +9,9 @@ ARG OSNAME=octopus
 # ==========================================
 # 2. HYPRLAND, HARDENED KERNEL & SYSTEM CORE
 # ==========================================
-RUN curl -Lo /etc/yum.repos.d/fedora.repo https://src.fedoraproject.org/rpms/fedora-repos/raw/f44/f/fedora.repo && \
-    curl -Lo /etc/yum.repos.d/fedora-updates.repo https://src.fedoraproject.org/rpms/fedora-repos/raw/f44/f/fedora-updates.repo && \
-    dnf -y install \
+RUN dnf config-manager addrepo --from-repofile=https://src.fedoraproject.org/rpms/fedora-repos/raw/f44/f/fedora.repo && \
+    dnf config-manager addrepo --from-repofile=https://src.fedoraproject.org/rpms/fedora-repos/raw/f44/f/fedora-updates.repo && \
+    dnf -y --releasever=44 install \
         hyprland \
         kitty \
         waybar \
