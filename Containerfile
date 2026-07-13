@@ -9,17 +9,18 @@ ARG OSNAME=octopus
 # ==========================================
 # 2. HYPRLAND, HARDENED KERNEL & SYSTEM CORE
 # ==========================================
-RUN dnf -y copr enable turing/kernel-hardened && \
+RUN dnf -y install dnf5-plugins-core || dnf -y install 'dnf-command(copr)' && \
+    dnf -y copr enable turing/kernel-hardened && \
     dnf -y install \
-    kernel-hardened \
-    kernel-hardened-modules \
-    hyprland \
-    kitty \
-    waybar \
-    fish \
-    distrobox \
-    ansible-core \
-    clevis clevis-dracut clevis-systemd cryptsetup \
+        kernel-hardened \
+        kernel-hardened-modules \
+        hyprland \
+        kitty \
+        waybar \
+        fish \
+        distrobox \
+        ansible-core \
+        clevis clevis-dracut clevis-systemd cryptsetup \
     && dnf clean all
 
 # Force the system to prioritize the hardened kernel on boot
