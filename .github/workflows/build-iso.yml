@@ -16,6 +16,10 @@ jobs:
       packages: write
 
     steps:
+      - name: Load Btrfs Kernel Module
+        run: |
+          sudo modprobe btrfs
+          sudo lsmod | grep btrfs
       - name: Checkout repository
         uses: actions/checkout@v4
 
