@@ -17,6 +17,8 @@ RUN dnf -y install 'dnf5-command(copr)'
 RUN dnf -y copr enable lionheartp/Hyprland
 
 RUN dnf -y install \
+	# Important LARPing
+	fastfetch \
     	# Compositor & UI Shell
         hyprland \
         kitty \
