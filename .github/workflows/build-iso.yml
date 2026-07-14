@@ -53,6 +53,7 @@ jobs:
           image: ${{ env.FINAL_IMAGE_TAG }}
           config-file: ./config.toml
           types: raw
+          arguments: --rootfs btrfs
 
       # Step 3: Upload the built raw image so users can download it from GitHub
       - name: Upload Raw Disk Artifact
