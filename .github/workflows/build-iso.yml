@@ -1,4 +1,4 @@
-name: Build Octopus Linux ISO
+name: Build Octopus Linux Raw Disk
 
 on:
   push:
@@ -46,17 +46,17 @@ jobs:
           # Pass it to the next step via GITHUB_ENV safely
           echo "FINAL_IMAGE_TAG=$TAG" >> $GITHUB_ENV
 
-      # Step 2: Convert the container into a bootable installer ISO
-      - name: Build Bootable ISO
+      # Step 2: Convert the container into a raw disk image
+      - name: Build Raw Disk Image
         uses: osbuild/bootc-image-builder-action@main
         with:
           image: ${{ env.FINAL_IMAGE_TAG }}
-          config-file: ./config.toml # <-- Fixed path anchoring
-          types: anaconda-iso
+          config-file: ./config.toml
+          types: raw
 
-      # Step 3: Upload the built ISO so users can download it from GitHub
-      - name: Upload ISO Artifact
+      # Step 3: Upload the built raw image so users can download it from GitHub
+      - name: Upload Raw Disk Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: octopus-linux-installer-iso
-          path: ${{ github.workspace }}/output/anaconda-iso/install.iso
+          name: octopus-linux-raw-disk
+          path: ${{ github.workspace }}/output/image/disk.raw
