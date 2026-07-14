@@ -73,13 +73,6 @@ WantedBy=multi-user.target" > /usr/lib/systemd/system/data.mount
 # Force enable the immutable units so they run on system targets
 RUN systemctl enable home.mount data.mount
 
-# ==========================================
-# 5. EMBED REMOTE TRACKING
-# ==========================================
-ARG IMAGE_URL=ghcr.io/orange-4998/octopus-linux:latest
-RUN mkdir -p /usr/lib/bootc/bound-images.d && \
-    echo "io.containers.bootc.clonable=true" > /usr/lib/bootc/bound-images.d/octopus.conf && \
-    echo "image = \"$IMAGE_URL\"" >> /usr/lib/bootc/bound-images.d/octopus.conf
 
 # ==========================================
 # 6. ADVANCED KERNEL HARDENING VIA KARGS
