@@ -27,41 +27,50 @@ RUN dnf -y install \
 	elfutils-libelf-devel \
 	&& dnf clean all
 
-RUN dnf -y install \
-	# NVIDIA drivers
-	akmod-nvidia-open \
-    	xorg-x11-drv-nvidia-cuda \
-	xorg-x11-drv-nvidia-power \
-	nvidia-vaapi-driver \
-	# Important LARPing
-	fastfetch \
-	# Sound
-	pipewire \
-	wireplumber \
-	rtkit \
-	alsa-utils \
-	# System necessities
-	vim \
-	neovim \
-	emacs-nox \
-	fdisk \
-	testdisk \
-	ranger \
-	w3m \
-	# Virtualization
-	qemu-kvm \
-	libvirt \
-	virt-install \
-	virt-manager \
-    	# Compositor & UI Shell
-        hyprland \
-        kitty \
-        waybar \
-        fish \
-        distrobox \
-        ansible-core \
-        clevis clevis-dracut cryptsetup \
-    && dnf clean all
+RUN dnf -y install <<EOF
+    # Corrected main NVIDIA driver package
+    akmod-nvidia
+    xorg-x11-drv-nvidia-cuda
+    xorg-x11-drv-nvidia-power
+    nvidia-vaapi-driver
+    
+    # Important LARPing
+    fastfetch
+    
+    # Sound
+    pipewire
+    wireplumber
+    rtkit
+    alsa-utils
+    
+    # System necessities
+    vim
+    neovim
+    emacs-nox
+    fdisk
+    testdisk
+    ranger
+    w3m
+    
+    # Virtualization
+    qemu-kvm
+    libvirt
+    virt-install
+    virt-manager
+    
+    # Compositor & UI Shell
+    hyprland
+    kitty
+    waybar
+    fish
+    distrobox
+    ansible-core
+    clevis
+    clevis-dracut
+    cryptsetup
+EOF
+
+RUN dnf clean all
 
 RUN kmodgenca && akmods --force
 
