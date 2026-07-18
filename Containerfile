@@ -25,8 +25,9 @@ RUN dnf -y install <<EOF
 	kernel-headers
 	akmods
 	elfutils-libelf-devel
-	&& dnf clean all
 EOF
+
+RUN dnf clean all
 
 RUN dnf -y install <<EOF
     # Corrected main NVIDIA driver package
