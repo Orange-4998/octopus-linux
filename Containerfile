@@ -42,6 +42,9 @@ RUN dnf -y install <<EOF
     wireplumber
     rtkit
     alsa-utils
+EOF
+
+RUN dnf -y install <<EOF
     
     # System necessities
     vim
