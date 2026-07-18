@@ -20,62 +20,59 @@ RUN dnf -y install \
     https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-44.noarch.rpm \
     https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-44.noarch.rpm
 
-RUN dnf -y install <<EOF
-	kernel-devel
-	kernel-headers
-	akmods
+RUN dnf -y install
+	kernel-devel \
+	kernel-headers \
+	akmods \
 	elfutils-libelf-devel
-EOF
 
 RUN dnf clean all
 
-RUN dnf -y install <<EOF
+RUN dnf -y install
     # Corrected main NVIDIA driver package
-    akmod-nvidia
-    xorg-x11-drv-nvidia-cuda
-    xorg-x11-drv-nvidia-power
+    akmod-nvidia \
+    xorg-x11-drv-nvidia-cuda \
+    xorg-x11-drv-nvidia-power \
     nvidia-vaapi-driver
-EOF    
 
-RUN dnf -y install <<EOF
+
+RUN dnf -y install
     # Important LARPing
-    fastfetch
+    fastfetch \
     
     # Sound
-    pipewire
-    wireplumber
-    rtkit
-    alsa-utils
-EOF
+    pipewire \
+    wireplumber \
+    rtkit \
+    alsa-utils \
 
-RUN dnf -y install <<EOF
-    
+
+RUN dnf -y install
     # System necessities
-    vim
-    neovim
-    emacs-nox
-    fdisk
-    testdisk
-    ranger
-    w3m
+    vim \
+    neovim \
+    emacs-nox \
+    fdisk \
+    testdisk \
+    ranger \
+    w3m \
     
     # Virtualization
-    qemu-kvm
-    libvirt
-    virt-install
-    virt-manager
+    qemu-kvm \
+    libvirt \
+    virt-install \
+    virt-manager \
     
     # Compositor & UI Shell
-    hyprland
-    kitty
-    waybar
-    fish
-    distrobox
-    ansible-core
-    clevis
-    clevis-dracut
-    cryptsetup
-EOF
+    hyprland \
+    kitty \
+    waybar \
+    fish \
+    distrobox \
+    ansible-core \
+    clevis \
+    clevis-dracut \
+    cryptsetup \
 
 RUN dnf clean all
 
