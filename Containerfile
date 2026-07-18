@@ -16,27 +16,12 @@ RUN dnf -y install 'dnf5-command(copr)'
 
 RUN dnf -y copr enable lionheartp/Hyprland
 
-RUN dnf -y install \
-    https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-44.noarch.rpm \
-    https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-44.noarch.rpm
-
-RUN dnf -y install \
-	kernel-devel \ 
-	kernel-headers \
-	akmods \
-	elfutils-libelf-devel
-
 RUN dnf clean all
 
 RUN dnf -y install \
-    # Corrected main NVIDIA driver package
-    akmod-nvidia \
-    xorg-x11-drv-nvidia-cuda \
-    xorg-x11-drv-nvidia-power \
-    nvidia-vaapi-driver
+    # Nvidia driver
+    libva-nvidia-driver \
 
-
-RUN dnf -y install \
     # Important LARPing
     fastfetch \
     
@@ -75,8 +60,6 @@ RUN dnf -y install \
     cryptsetup \
 
 RUN dnf clean all
-
-RUN kmodgenca && akmods --force
 
 # ==========================================
 # 2.5. ENSURING NVIDIA WORKS WITH HYPRLAND
