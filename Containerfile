@@ -29,7 +29,7 @@ RUN dnf -y install \
     pipewire \
     wireplumber \
     rtkit \
-    alsa-utils \
+    alsa-utils
 
 
 RUN dnf -y install \
@@ -57,7 +57,7 @@ RUN dnf -y install \
     ansible-core \
     clevis \
     clevis-dracut \
-    cryptsetup \
+    cryptsetup
 
 RUN dnf clean all
 
