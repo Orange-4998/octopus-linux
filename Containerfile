@@ -13,7 +13,7 @@ ARG OSNAME=octopus
 # 2. Feed the official upstream Fedora 44 and updates repo configuration files directly to DNF5.
 # 3. Layer strictly authorized user-space utilities and let DNF resolve the deep graphical dependencies.
 
-COPY --from=ghcr.io/ublue-os/akmods-nvidia:main-fedora-44 /rpms/ /tmp/ublue-rpms/
+COPY --from=ghcr.io/ublue-os/akmods-nvidia-open:main-44 /rpms/ /tmp/ublue-rpms/
 
 # RUN dnf -y install 'dnf5-command(copr)'
 
