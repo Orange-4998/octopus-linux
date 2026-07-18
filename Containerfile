@@ -17,64 +17,101 @@ RUN dnf -y install 'dnf5-command(copr)'
 RUN dnf -y copr enable lionheartp/Hyprland
 
 RUN dnf -y install \
+    https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-44.noarch.rpm \
+    https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-44.noarch.rpm
+
+RUN dnf -y install \
+	kernel-devel \
+	kernel-headers \
+	akmods \
+	elfutils-libelf-devel \
+	&& dnf clean all
+
+RUN dnf -y install \
+	# NVIDIA drivers
+	akmod-nvidia-open \
+    	xorg-x11-drv-nvidia-cuda \
+	xorg-x11-drv-nvidia-power \
+	nvidia-vaapi-driver \
 	# Important LARPing
 	fastfetch \
+	# Sound
+	pipewire \
+	wireplumber \
+	rtkit \
+	alsa-utils \
+	# System necessities
+	vim \
+	neovim \
+	emacs-nox \
+	fdisk \
+	testdisk \
+	ranger \
+	w3m \
+	# Virtualization
+	qemu-kvm \
+	libvirt \
+	virt-install \
+	virt-manager \
     	# Compositor & UI Shell
         hyprland \
         kitty \
         waybar \
-        fish \ 
+        fish \
         distrobox \
         ansible-core \
         clevis clevis-dracut cryptsetup \
     && dnf clean all
 
+RUN kmodgenca && akmods --force
+
+# ==========================================
+# 2.5. ENSURING NVIDIA WORKS WITH HYPRLAND
+# ==========================================
+# Kernel Arguments & Bootc Hooks
+RUN mkdir -p /usr/lib/bootc/kargs.d && \
+    echo "nvidia-drm.modeset=1" > /usr/lib/bootc/kargs.d/nvidia.karg
+
+# Driver Framework Configuration Files
+RUN echo "options nvidia NVreg_PreserveVideoMemoryAllocations=1" > /etc/modprobe.d/nvidia-power.conf && \
+    echo "options nvidia_drm fbdev=1" >> /etc/modprobe.d/nvidia-power.conf
+
+# Environment Variables for System-Wide Wayland Optimization
+RUN echo "GBM_BACKEND=nvidia-drm" >> /etc/environment && \
+    echo "__GLX_VENDOR_LIBRARY_NAME=nvidia" >> /etc/environment && \
+    echo "ENABLE_VKB_LAYERS=1" >> /etc/environment && \
+    echo "NVD_BACKEND=direct" >> /etc/environment && \
+    echo "LIBVA_DRIVER_NAME=nvidia" >> /etc/environment && \
+    echo "ELECTRON_OZONE_PLATFORM_HINT=auto" >> /etc/environment && \
+    echo "WLR_DRM_NO_MODIFIERS=1" >> /etc/environment
+
+## systemctl stuff
+RUN systemctl enable libvirtd.service \
+                     nvidia-suspend.service \
+                     nvidia-resume.service \
+                     nvidia-hibernate.service
+
 # ==========================================
 # 3. USER SETUP
 # ==========================================
-RUN useradd -m -s /bin/bash ansible-bot
-RUN useradd -m -s /usr/bin/fish -G wheel human && \
+# let's hope the user changes their password from the default
+RUN useradd -m -d /var/home/ansible-bot -s /bin/bash -u 1001 ansible-bot
+RUN useradd -m -d /var/home/human -s /usr/bin/fish -G wheel,ansible-bot -u 1000 human && \
     echo "human:octopus" | chpasswd
 
 # Establish mounting layout directories before assigning immutable policies
-RUN mkdir -p /home/box-data /data && \
-    chown human:human /data && \
-    chown -R human:human /home/box-data
+RUN mkdir -p /var/data && \
+    chown human:human /var/data && \
+    chown human:ansible-bot /var/home && \
+    chmod 2770 /var/home && \
+    chmod 700 /var/data
 
 # ==========================================
-# 4. IMMUTABLE SYSTEMD BLAST-DOOR MOUNTS
+# 5. SYSTEM FISH SHELL ENTRY HOOK
 # ==========================================
-# --- /home Mount (ext4) ---
-RUN echo -e "[Unit]\n\
-Description=User Space Home Directory (/home)\n\
-ConditionPathExists=/home\n\
-\n\
-[Mount]\n\
-What=LABEL=${OSNAME}-HOME\n\
-Where=/home\n\
-Type=ext4\n\
-Options=defaults\n\
-\n\
-[Install]\n\
-WantedBy=multi-user.target" > /usr/lib/systemd/system/home.mount
-
-# --- /data Mount (Btrfs with SSD TRIM and strict blast-door security flags) ---
-RUN echo -e "[Unit]\n\
-Description=Secure Data Partition (/data)\n\
-ConditionPathExists=/data\n\
-\n\
-[Mount]\n\
-What=LABEL=${OSNAME}-DATA\n\
-Where=/data\n\
-Type=btrfs\n\
-Options=defaults,noexec,nosuid,nodev,discard=async\n\
-\n\
-[Install]\n\
-WantedBy=multi-user.target" > /usr/lib/systemd/system/data.mount
-
-# Force enable the immutable units so they run on system targets
-RUN systemctl enable home.mount data.mount
-
+# This directory is parsed by Fish on startup regardless of what is inside /home.
+COPY octopus-init.fish /usr/share/fish/vendor_conf.d/octopus-init.fish
+RUN chmod 644 /usr/share/fish/vendor_conf.d/octopus-init.fish
 
 # ==========================================
 # 6. ADVANCED KERNEL HARDENING VIA KARGS
