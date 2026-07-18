@@ -21,7 +21,7 @@ RUN dnf -y install \
     https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-44.noarch.rpm
 
 RUN dnf -y install \
-	kernel-devel \
+	kernel-devel \ 
 	kernel-headers \
 	akmods \
 	elfutils-libelf-devel
