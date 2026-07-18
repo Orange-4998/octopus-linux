@@ -20,7 +20,7 @@ RUN dnf -y install \
     https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-44.noarch.rpm \
     https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-44.noarch.rpm
 
-RUN dnf -y install
+RUN dnf -y install \
 	kernel-devel \
 	kernel-headers \
 	akmods \
@@ -28,7 +28,7 @@ RUN dnf -y install
 
 RUN dnf clean all
 
-RUN dnf -y install
+RUN dnf -y install \
     # Corrected main NVIDIA driver package
     akmod-nvidia \
     xorg-x11-drv-nvidia-cuda \
@@ -36,7 +36,7 @@ RUN dnf -y install
     nvidia-vaapi-driver
 
 
-RUN dnf -y install
+RUN dnf -y install \
     # Important LARPing
     fastfetch \
     
@@ -47,7 +47,7 @@ RUN dnf -y install
     alsa-utils \
 
 
-RUN dnf -y install
+RUN dnf -y install \
     # System necessities
     vim \
     neovim \
