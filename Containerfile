@@ -20,12 +20,13 @@ RUN dnf -y install \
     https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-44.noarch.rpm \
     https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-44.noarch.rpm
 
-RUN dnf -y install \
-	kernel-devel \
-	kernel-headers \
-	akmods \
-	elfutils-libelf-devel \
+RUN dnf -y install <<EOF
+	kernel-devel
+	kernel-headers
+	akmods
+	elfutils-libelf-devel
 	&& dnf clean all
+EOF
 
 RUN dnf -y install <<EOF
     # Corrected main NVIDIA driver package
@@ -33,7 +34,9 @@ RUN dnf -y install <<EOF
     xorg-x11-drv-nvidia-cuda
     xorg-x11-drv-nvidia-power
     nvidia-vaapi-driver
-    
+EOF    
+
+RUN dnf -y install <<EOF
     # Important LARPing
     fastfetch
     
