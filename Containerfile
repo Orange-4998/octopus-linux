@@ -15,7 +15,7 @@ ARG OSNAME=octopus
 
 COPY --from=ghcr.io/ublue-os/akmods-nvidia-open:main-44 /rpms/ /tmp/ublue-rpms/
 
-# RUN dnf -y install 'dnf5-command(copr)'
+RUN dnf -y install 'dnf5-command(copr)'
 
 RUN dnf -y copr enable lionheartp/Hyprland
 
