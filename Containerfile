@@ -12,13 +12,18 @@ ARG OSNAME=octopus
 # 1. Install native DNF5 plugins to unlock repository management.
 # 2. Feed the official upstream Fedora 44 and updates repo configuration files directly to DNF5.
 # 3. Layer strictly authorized user-space utilities and let DNF resolve the deep graphical dependencies.
-RUN dnf -y install 'dnf5-command(copr)'
+
+COPY --from=ghcr.io/ublue-os/akmods-nvidia:main-fedora-44 /rpms/ /tmp/ublue-rpms/
+
+# RUN dnf -y install 'dnf5-command(copr)'
 
 RUN dnf -y copr enable lionheartp/Hyprland
 
 RUN dnf clean all
 
 RUN dnf -y install \
+    # useradd
+    shadow-utils \
     # Nvidia driver
     libva-nvidia-driver \
 
@@ -59,7 +64,10 @@ RUN dnf -y install \
     clevis-dracut \
     cryptsetup
 
-RUN dnf clean all
+RUN dnf -y install /tmp/ublue-rpms/kmod-nvidia-open-*.rpm \
+                   /tmp/ublue-rpms/nvidia-*.rpm
+
+RUN dnf clean all && rm -rf /tmp/ublue-rpms
 
 # ==========================================
 # 2.5. ENSURING NVIDIA WORKS WITH HYPRLAND
@@ -82,10 +90,7 @@ RUN echo "GBM_BACKEND=nvidia-drm" >> /etc/environment && \
     echo "WLR_DRM_NO_MODIFIERS=1" >> /etc/environment
 
 ## systemctl stuff
-RUN systemctl enable libvirtd.service \
-                     nvidia-suspend.service \
-                     nvidia-resume.service \
-                     nvidia-hibernate.service
+RUN systemctl enable libvirtd.service
 
 # ==========================================
 # 3. USER SETUP
