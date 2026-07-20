@@ -13,9 +13,6 @@ ARG OSNAME=octopus
 # 2. Feed the official upstream Fedora 44 and updates repo configuration files directly to DNF5.
 # 3. Layer strictly authorized user-space utilities and let DNF resolve the deep graphical dependencies.
 
-# ==========================================
-# UBlue NVIDIA Drivers
-# ==========================================
 RUN dnf -y install 'dnf5-command(copr)'
 
 RUN dnf -y copr enable lionheartp/Hyprland
@@ -30,6 +27,7 @@ RUN dnf -y install \
 
     # Important LARPing
     fastfetch \
+    systemd-ukify \
     
     # Sound
     pipewire \
@@ -65,6 +63,10 @@ RUN dnf -y install \
     clevis-dracut \
     cryptsetup
 
+# ========================================
+# 2.1. INSTALLING OPEN SOURCE DRIVERS
+# ========================================
+
 # --- PURE OPEN SOURCE NVIDIA STACK (MESA + NVK + OPEN KERNEL) ---
 # Target: bootc bare metal (Turing architectures and newer)
 
@@ -87,20 +89,38 @@ RUN dnf install -y \
     && dnf install -y akmod-nvidia-open \
     && dnf clean all
 
+# ========================================
+# 2.2. PREPARING MOK KEYS
+# ========================================
 
-# INTERCEPT TO FORCE OPEN VERSION
-RUN mkdir -p /etc/rpm && \
-    echo "%_with_kmod_nvidia_open 1" > /etc/rpm/macros.nvidia-kmod
+# 1. Create the target key directory infrastructure
+RUN mkdir -p /etc/pki/akmods/private /etc/pki/akmods/certs /usr/share/octopus
 
+# 2. Generate a valid, cryptographic Machine Owner Key pair inside the image layer
+RUN openssl req -new -x509 -newkey rsa:2048 \
+    -keyout /etc/pki/akmods/private/private.key \
+    -out /etc/pki/akmods/certs/public.der \
+    -nodes -days 3650 \
+    -subj "/CN=Signed by the Maintainers of Octopus Linux/"
 
-# 3. Force compile the open-source kernel modules during the image build stage
+# 3. Cache a mirror clone of the public certificate for outside bare-metal enrollment
+RUN cp /etc/pki/akmods/certs/public.der /usr/share/octopus/octopus-mok.der
+
+RUN sed -i 's|#WGKEY=.*|WGKEY=/etc/pki/akmods/private/private.key|' /etc/sysconfig/akmods && \
+    sed -i 's|#WGCERT=.*|WGCERT=/etc/pki/akmods/certs/public.der|' /etc/sysconfig/akmods
+
+# ==========================================
+# 2.3. COMPILING KERNEL WITH NVIDIA MODULE
+# ==========================================
+
+# Force compile the open-source kernel modules during the image build stage
 RUN akmods --force --kernels $(rpm -q kernel --queryformat "%{VERSION}-%{RELEASE}.%{ARCH}\n" | tail -n 1)
 
-# 4. Route system video acceleration requests to the open source Mesa VA-API drivers
+# Route system video acceleration requests to the open source Mesa VA-API drivers
 RUN echo "export LIBVA_DRIVER_NAME=nouveau" >> /etc/profile.d/open-nvidia.sh
 
 # ==========================================
-# 2.5. ENSURING NVIDIA WORKS WITH HYPRLAND
+# 2.4. ENSURING NVIDIA WORKS WITH HYPRLAND
 # ==========================================
 # Kernel Arguments & Bootc Hooks
 RUN mkdir -p /usr/lib/bootc/kargs.d && \
@@ -150,3 +170,16 @@ RUN chmod 644 /usr/share/fish/vendor_conf.d/octopus-init.fish
 # Baked directly into a single, cohesive line inside the bootc kargs registry.
 RUN mkdir -p /usr/lib/bootc/kargs.d && \
     echo 'init_on_alloc=1 init_on_free=1 page_alloc.shuffle=1 slab_nomerge vsyscall=none randomize_kstack_offset=on intel_iommu=on amd_iommu=on iommu=strict efi=disable_early_pci_dma lockdown=integrity' > /usr/lib/bootc/kargs.d/00-octopus-hardening.conf
+
+# ==========================================
+# 7. AUTOMATED SYSTEMD-BOOT & UKI PROFILES
+# ==========================================
+# 1. Enforce systemd-boot as the native system engine (bypassing GRUB entirely)
+RUN mkdir -p /usr/lib/bootc/install.d && \
+    echo '[install]' > /usr/lib/bootc/install.d/00-octopus.toml && \
+    echo 'bootloader = "systemd-boot"' >> /usr/lib/bootc/install.d/00-octopus.toml
+
+# 2. Instruct the image constructor to package everything into a single, cohesive UKI blob
+# This combines the hardened kernel, your advanced kargs, and the initramfs components.
+RUN mkdir -p /etc/kernel && \
+    echo "layout=uki" > /etc/kernel/install.conf
