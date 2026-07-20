@@ -65,22 +65,33 @@ RUN dnf -y install \
     clevis-dracut \
     cryptsetup
 
+# --- PURE OPEN SOURCE NVIDIA STACK (MESA + NVK + OPEN KERNEL) ---
+# Target: bootc bare metal (Turing architectures and newer)
 
-# 2. Install Drivers, X11/Mesa Libs, and Kernel Development Headers 
-# kernel-devel-matched ensures akmods builds for the exact kernel inside this bootc image layer
+# 1. Install standard open source graphics libraries and tools
+# This pulls in NVK, Zink, and the native VA-API translation layers via Mesa
 RUN dnf install -y \
-    akmod-nvidia \
-    xorg-x11-drv-nvidia \
-    xorg-x11-drv-nvidia-libs \
-    xorg-x11-drv-nvidia-cuda \
+    mesa-vulkan-drivers \
+    mesa-va-drivers \
+    mesa-dri-drivers \
+    vulkan-loader \
     kernel-devel-matched \
     kernel-headers \
-    vulkan-loader \
     && dnf clean all
 
-# 3. CRITICAL FOR BOOTC BARE METAL: Force Akmods to build the driver *during* the image build.
-# This prevents the system from booting to a black screen or missing modules on bare metal.
+# 2. Add the out-of-tree open-source kernel driver modules
+# (Note: For RHEL/Fedora streams transitioning to the modern 'Nova' Rust driver, 
+# akmod-nvidia-open remains the bridge for compiling the open kernel modules)
+RUN dnf install -y \
+    https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm \
+    && dnf install -y akmod-nvidia-open \
+    && dnf clean all
+
+# 3. Force compile the open-source kernel modules during the image build stage
 RUN akmods --force --kernels $(rpm -q kernel --queryformat "%{VERSION}-%{RELEASE}.%{ARCH}\n" | tail -n 1)
+
+# 4. Route system video acceleration requests to the open source Mesa VA-API drivers
+RUN echo "export LIBVA_DRIVER_NAME=nouveau" >> /etc/profile.d/open-nvidia.sh
 
 # ==========================================
 # 2.5. ENSURING NVIDIA WORKS WITH HYPRLAND
