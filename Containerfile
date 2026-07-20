@@ -87,6 +87,12 @@ RUN dnf install -y \
     && dnf install -y akmod-nvidia-open \
     && dnf clean all
 
+
+# INTERCEPT TO FORCE OPEN VERSION
+RUN mkdir -p /etc/rpm && \
+    echo "%_with_kmod_nvidia_open 1" > /etc/rpm/macros.nvidia-kmod
+
+
 # 3. Force compile the open-source kernel modules during the image build stage
 RUN akmods --force --kernels $(rpm -q kernel --queryformat "%{VERSION}-%{RELEASE}.%{ARCH}\n" | tail -n 1)
 
