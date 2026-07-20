@@ -65,15 +65,22 @@ RUN dnf -y install \
     clevis-dracut \
     cryptsetup
 
-COPY --from=ghcr.io/ublue-os/akmods-nvidia-open:main-44-7.1.3-201.fc44 / /tmp/akmods-nvidia
-RUN find /tmp/akmods-nvidia
-## optionally install remove old and install new kernel
-# dnf -y remove --no-autoremove kernel kernel-core kernel-modules kernel-modules-core kernel-modules-extra
-## install ublue support package and desired kmod(s)
-RUN dnf install /tmp/rpms/ublue-os/ublue-os-nvidia*.rpm
-RUN dnf install /tmp/rpms/kmods/kmod-nvidia*.rpm
 
-RUN dnf clean all
+# 2. Install Drivers, X11/Mesa Libs, and Kernel Development Headers 
+# kernel-devel-matched ensures akmods builds for the exact kernel inside this bootc image layer
+RUN dnf install -y \
+    akmod-nvidia \
+    xorg-x11-drv-nvidia \
+    xorg-x11-drv-nvidia-libs \
+    xorg-x11-drv-nvidia-cuda \
+    kernel-devel-matched \
+    kernel-headers \
+    vulkan-loader \
+    && dnf clean all
+
+# 3. CRITICAL FOR BOOTC BARE METAL: Force Akmods to build the driver *during* the image build.
+# This prevents the system from booting to a black screen or missing modules on bare metal.
+RUN akmods --force --kernels $(rpm -q kernel --queryformat "%{VERSION}-%{RELEASE}.%{ARCH}\n" | tail -n 1)
 
 # ==========================================
 # 2.5. ENSURING NVIDIA WORKS WITH HYPRLAND
