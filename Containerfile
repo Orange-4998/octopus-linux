@@ -106,8 +106,8 @@ RUN openssl req -new -x509 -newkey rsa:2048 \
 # 3. Cache a mirror clone of the public certificate for outside bare-metal enrollment
 RUN cp /etc/pki/akmods/certs/public.der /usr/share/octopus/octopus-mok.der
 
-RUN sed -i 's|#WGKEY=.*|WGKEY=/etc/pki/akmods/private/private.key|' /etc/sysconfig/akmods && \
-    sed -i 's|#WGCERT=.*|WGCERT=/etc/pki/akmods/certs/public.der|' /etc/sysconfig/akmods
+# RUN sed -i 's|#WGKEY=.*|WGKEY=/etc/pki/akmods/private/private.key|' /etc/sysconfig/akmods && \
+#    sed -i 's|#WGCERT=.*|WGCERT=/etc/pki/akmods/certs/public.der|' /etc/sysconfig/akmods
 
 # ==========================================
 # 2.3. COMPILING KERNEL WITH NVIDIA MODULE
