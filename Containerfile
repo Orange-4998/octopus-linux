@@ -16,14 +16,6 @@ ARG OSNAME=octopus
 # ==========================================
 # UBlue NVIDIA Drivers
 # ==========================================
-COPY --from=ghcr.io/ublue-os/akmods-nvidia-open:main-44-7.1.3-201.fc44 / /tmp/akmods-nvidia
-RUN find /tmp/akmods-nvidia
-## optionally install remove old and install new kernel
-# dnf -y remove --no-autoremove kernel kernel-core kernel-modules kernel-modules-core kernel-modules-extra
-## install ublue support package and desired kmod(s)
-RUN dnf install /tmp/rpms/ublue-os/ublue-os-nvidia*.rpm
-RUN dnf install /tmp/rpms/kmods/kmod-nvidia*.rpm
-
 RUN dnf -y install 'dnf5-command(copr)'
 
 RUN dnf -y copr enable lionheartp/Hyprland
@@ -72,6 +64,14 @@ RUN dnf -y install \
     clevis \
     clevis-dracut \
     cryptsetup
+
+COPY --from=ghcr.io/ublue-os/akmods-nvidia-open:main-44-7.1.3-201.fc44 / /tmp/akmods-nvidia
+RUN find /tmp/akmods-nvidia
+## optionally install remove old and install new kernel
+# dnf -y remove --no-autoremove kernel kernel-core kernel-modules kernel-modules-core kernel-modules-extra
+## install ublue support package and desired kmod(s)
+RUN dnf install /tmp/rpms/ublue-os/ublue-os-nvidia*.rpm
+RUN dnf install /tmp/rpms/kmods/kmod-nvidia*.rpm
 
 RUN dnf clean all
 
