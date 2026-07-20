@@ -13,7 +13,16 @@ ARG OSNAME=octopus
 # 2. Feed the official upstream Fedora 44 and updates repo configuration files directly to DNF5.
 # 3. Layer strictly authorized user-space utilities and let DNF resolve the deep graphical dependencies.
 
-COPY --from=ghcr.io/ublue-os/akmods-nvidia-open:main-44 /rpms/ /tmp/ublue-rpms/
+# ==========================================
+# UBlue NVIDIA Drivers
+# ==========================================
+COPY --from=ghcr.io/ublue-os/akmods-nvidia:main-44 / /tmp/akmods-nvidia
+RUN find /tmp/akmods-nvidia
+## optionally install remove old and install new kernel
+# dnf -y remove --no-autoremove kernel kernel-core kernel-modules kernel-modules-core kernel-modules-extra
+## install ublue support package and desired kmod(s)
+RUN dnf install /tmp/rpms/ublue-os/ublue-os-nvidia*.rpm
+RUN dnf install /tmp/rpms/kmods/kmod-nvidia*.rpm
 
 RUN dnf -y install 'dnf5-command(copr)'
 
@@ -64,10 +73,7 @@ RUN dnf -y install \
     clevis-dracut \
     cryptsetup
 
-RUN dnf -y install /tmp/ublue-rpms/kmod-nvidia-open-*.rpm \
-                   /tmp/ublue-rpms/nvidia-*.rpm
-
-RUN dnf clean all && rm -rf /tmp/ublue-rpms
+RUN dnf clean all
 
 # ==========================================
 # 2.5. ENSURING NVIDIA WORKS WITH HYPRLAND
