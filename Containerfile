@@ -24,6 +24,7 @@ RUN dnf -y install \
     shadow-utils \
     # Nvidia driver
     libva-nvidia-driver \
+    egl-wayland \
 
     # Important LARPing
     fastfetch \
