@@ -16,13 +16,13 @@ if test (tty) = "/dev/tty1"; and test "$USER" = "human"
         
         # 1. Decrypt and Mount Home Space
         if not test -d /var/home/human/.config
-            sudo cryptsetup open /dev/disk/by-label/octopus-HOME luks-home
+            sudo cryptsetup open /dev/disk/by-partlabel/octopus-HOME luks-home
             sudo mount /dev/mapper/luks-home /var/home/human
         end
 
         # 2. Decrypt and Mount Shuttle Data Space
         if not test -d /data/.mounted
-            sudo cryptsetup open /dev/disk/by-label/octopus-DATA luks-data
+            sudo cryptsetup open /dev/disk/by-partlabel/octopus-DATA luks-data
             sudo mount -o noexec,nosuid,nodev,discard=async /dev/mapper/luks-data /data
         end
 

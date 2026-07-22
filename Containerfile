@@ -145,6 +145,9 @@ RUN systemctl enable libvirtd.service
 # ==========================================
 # 3. USER SETUP
 # ==========================================
+# make data partition
+RUN mkdir /data
+
 # let's hope the user changes their password from the default
 RUN useradd -m -d /var/home/ansible-bot -s /bin/bash -u 1001 ansible-bot
 RUN useradd -m -d /var/home/human -s /usr/bin/fish -G wheel,ansible-bot -u 1000 human && \
