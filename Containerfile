@@ -96,6 +96,9 @@ RUN dnf install -y \
 RUN dnf install -y \
     https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm \
     && dnf install -y akmod-nvidia-open \
+    nvidia-container-toolkit \
+    nvidia-gpu-firmware \
+    xdg-desktop-portal-hyprland \
     && dnf clean all
 
 # ========================================
@@ -125,15 +128,16 @@ RUN cp /etc/pki/akmods/certs/public.der /usr/share/octopus/octopus-mok.der
 # Force compile the open-source kernel modules during the image build stage
 RUN akmods --force --kernels $(rpm -q kernel --queryformat "%{VERSION}-%{RELEASE}.%{ARCH}\n" | tail -n 1)
 
-# Route system video acceleration requests to the open source Mesa VA-API drivers
-RUN echo "export LIBVA_DRIVER_NAME=nouveau" >> /etc/profile.d/open-nvidia.sh
 
 # ==========================================
 # 2.4. ENSURING NVIDIA WORKS WITH HYPRLAND
 # ==========================================
+# Allow GUI apps and Wayland shader compilation without SELinux execmem blocks
+RUN setsebool -P selinuxuser_execmem 1 || true
+
 # Kernel Arguments & Bootc Hooks
 RUN mkdir -p /usr/lib/bootc/kargs.d && \
-    echo "nvidia-drm.modeset=1" > /usr/lib/bootc/kargs.d/nvidia.karg
+    echo 'kargs = ["nvidia-drm.modeset=1", "nvidia-drm.fbdev=1"]' > /usr/lib/bootc/kargs.d/nvidia.toml
 
 # Driver Framework Configuration Files
 RUN echo "options nvidia NVreg_PreserveVideoMemoryAllocations=1" > /etc/modprobe.d/nvidia-power.conf && \
@@ -181,8 +185,7 @@ RUN chmod 644 /usr/share/fish/vendor_conf.d/octopus-init.fish
 # ==========================================
 # Baked directly into a single, cohesive line inside the bootc kargs registry.
 RUN mkdir -p /usr/lib/bootc/kargs.d && \
-    echo 'init_on_alloc=1 init_on_free=1 page_alloc.shuffle=1 slab_nomerge vsyscall=none randomize_kstack_offset=on intel_iommu=on amd_iommu=on iommu=strict efi=disable_early_pci_dma lockdown=integrity' > /usr/lib/bootc/kargs.d/00-octopus-hardening.conf
-
+    echo 'kargs = ["init_on_alloc=1", "init_on_free=1", "page_alloc.shuffle=1", "slab_nomerge", "vsyscall=none", "randomize_kstack_offset=on", "intel_iommu=on", "amd_iommu=on", "iommu=strict", "efi=disable_early_pci_dma", "lockdown=integrity"]' > /usr/lib/bootc/kargs.d/00-octopus-hardening.toml
 # ==========================================
 # 7. AUTOMATED SYSTEMD-BOOT & UKI PROFILES
 # ==========================================
