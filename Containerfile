@@ -64,6 +64,14 @@ RUN dnf -y install \
     clevis-dracut \
     cryptsetup
 
+# fonts
+RUN dnf install -y \
+    fontconfig \
+    dejavu-sans-mono-fonts \
+    liberation-mono-fonts \
+    google-noto-sans-fonts && \
+    fc-cache -fv
+
 # ========================================
 # 2.1. INSTALLING OPEN SOURCE DRIVERS
 # ========================================

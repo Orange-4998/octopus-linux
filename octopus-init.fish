@@ -7,8 +7,7 @@ if test (tty) = "/dev/tty1"; and test "$USER" = "human"
     echo ""
     
     # Prompt user with a 5-second timeout
-    echo -n "Launch graphical Hyprland session now? [y/N]: "
-    read -t 5 -l mood
+    read -P "Launch graphical Hyprland session now? [y/N]: " -l mood
     echo ""
 
     if test "$mood" = "y"; or test "$mood" = "Y"
