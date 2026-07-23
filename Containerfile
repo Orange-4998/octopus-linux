@@ -96,7 +96,6 @@ RUN dnf install -y \
 RUN dnf install -y \
     https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm \
     && dnf install -y akmod-nvidia-open \
-    nvidia-container-toolkit \
     nvidia-gpu-firmware \
     xdg-desktop-portal-hyprland \
     && dnf clean all
