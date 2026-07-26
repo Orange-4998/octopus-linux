@@ -56,6 +56,7 @@ RUN dnf -y install \
     # Compositor & UI Shell
     hyprland \
     kitty \
+    foot \
     waybar \
     fish \
     distrobox \
@@ -82,9 +83,9 @@ RUN dnf install -y \
 # 1. Install standard open source graphics libraries and tools
 # This pulls in NVK, Zink, and the native VA-API translation layers via Mesa
 RUN dnf install -y \
-    mesa-vulkan-drivers \
-    mesa-va-drivers \
-    mesa-dri-drivers \
+    # mesa-vulkan-drivers \
+    # mesa-va-drivers \
+    # mesa-dri-drivers \
     vulkan-loader \
     kernel-devel-matched \
     kernel-headers \
@@ -95,10 +96,21 @@ RUN dnf install -y \
 # akmod-nvidia-open remains the bridge for compiling the open kernel modules)
 RUN dnf install -y \
     https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm \
-    && dnf install -y akmod-nvidia-open \
+    && dnf install -y \
+    # Proprietary Shitware
+    xorg-x11-drv-nvidia
+    xorg-x11-drv-nvidia-cuda
+    xorg-x11-drv-nvidia-power
+    xorg-x11-drv-nvidia-libs
+    nvidia-vaapi-driver
+    # OG Open Drivers
+    akmod-nvidia-open \
     nvidia-gpu-firmware \
     xdg-desktop-portal-hyprland \
     && dnf clean all
+
+# Enable the shitware
+RUN systemctl enable nvidia-suspend.service nvidia-hibernate.service nvidia-resume.service || true
 
 # ========================================
 # 2.2. PREPARING MOK KEYS
@@ -149,7 +161,7 @@ RUN echo "GBM_BACKEND=nvidia-drm" >> /etc/environment && \
     echo "NVD_BACKEND=direct" >> /etc/environment && \
     echo "LIBVA_DRIVER_NAME=nvidia" >> /etc/environment && \
     echo "ELECTRON_OZONE_PLATFORM_HINT=auto" >> /etc/environment && \
-    echo "WLR_DRM_NO_MODIFIERS=1" >> /etc/environment
+    # echo "WLR_DRM_NO_MODIFIERS=1" >> /etc/environment
 
 ## systemctl stuff
 RUN systemctl enable libvirtd.service
