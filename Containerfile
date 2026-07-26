@@ -98,11 +98,11 @@ RUN dnf install -y \
     https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm \
     && dnf install -y \
     # Proprietary Shitware
-    xorg-x11-drv-nvidia
-    xorg-x11-drv-nvidia-cuda
-    xorg-x11-drv-nvidia-power
-    xorg-x11-drv-nvidia-libs
-    nvidia-vaapi-driver
+    xorg-x11-drv-nvidia \
+    xorg-x11-drv-nvidia-cuda \
+    xorg-x11-drv-nvidia-power \
+    xorg-x11-drv-nvidia-libs \
+    nvidia-vaapi-driver \
     # OG Open Drivers
     akmod-nvidia-open \
     nvidia-gpu-firmware \
