@@ -159,7 +159,7 @@ RUN echo "GBM_BACKEND=nvidia-drm" >> /etc/environment && \
     echo "ENABLE_VKB_LAYERS=1" >> /etc/environment && \
     echo "NVD_BACKEND=direct" >> /etc/environment && \
     echo "LIBVA_DRIVER_NAME=nvidia" >> /etc/environment && \
-    echo "ELECTRON_OZONE_PLATFORM_HINT=auto" >> /etc/environment && \
+    echo "ELECTRON_OZONE_PLATFORM_HINT=auto" >> /etc/environment
     # echo "WLR_DRM_NO_MODIFIERS=1" >> /etc/environment
 
 ## systemctl stuff
