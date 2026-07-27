@@ -101,8 +101,7 @@ RUN dnf install -y \
     xorg-x11-drv-nvidia \
     xorg-x11-drv-nvidia-cuda \
     xorg-x11-drv-nvidia-power \
-    xorg-x11-drv-nvidia \
-    nvidia-vaapi-driver \
+    libva-nvidia-driver \
     # OG Open Drivers
     akmod-nvidia-open \
     nvidia-gpu-firmware \
