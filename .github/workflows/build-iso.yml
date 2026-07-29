@@ -16,6 +16,11 @@ jobs:
       packages: write
 
     steps:
+      - name: Update crun
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y crun
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -62,3 +67,4 @@ jobs:
         with:
           name: octopus-linux-raw-disk
           path: ${{ github.workspace }}/output/image/disk.raw
+
