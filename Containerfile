@@ -128,6 +128,10 @@ RUN openssl req -new -x509 -newkey rsa:2048 \
 # 3. Cache a mirror clone of the public certificate for outside bare-metal enrollment
 RUN cp /etc/pki/akmods/certs/public.der /usr/share/octopus/octopus-mok.der
 
+# 4. Configure akmods to sign modules during compilation
+RUN echo 'WGKEY="/etc/pki/akmods/private/private.key"' >> /etc/sysconfig/akmods && \
+    echo 'WGCERT="/etc/pki/akmods/certs/public.der"' >> /etc/sysconfig/akmods
+
 # RUN sed -i 's|#WGKEY=.*|WGKEY=/etc/pki/akmods/private/private.key|' /etc/sysconfig/akmods && \
 #    sed -i 's|#WGCERT=.*|WGCERT=/etc/pki/akmods/certs/public.der|' /etc/sysconfig/akmods
 
@@ -137,6 +141,7 @@ RUN cp /etc/pki/akmods/certs/public.der /usr/share/octopus/octopus-mok.der
 
 # Force compile the open-source kernel modules during the image build stage
 RUN akmods --force --kernels $(rpm -q kernel --queryformat "%{VERSION}-%{RELEASE}.%{ARCH}\n" | tail -n 1)
+RUN dracut --regenerate-all --force
 
 
 # ==========================================
@@ -147,7 +152,7 @@ RUN setsebool -P selinuxuser_execmem 1 || true
 
 # Kernel Arguments & Bootc Hooks
 RUN mkdir -p /usr/lib/bootc/kargs.d && \
-    echo 'kargs = ["nvidia-drm.modeset=1", "nvidia-drm.fbdev=1"]' > /usr/lib/bootc/kargs.d/nvidia.toml
+    echo 'kargs = ["nvidia-drm.modeset=1", "nvidia-drm.fbdev=1", "rd.driver.blacklist=nouveau", "modprobe.blacklist=nouveau"]' > /usr/lib/bootc/kargs.d/nvidia.toml
 
 # Driver Framework Configuration Files
 RUN echo "options nvidia NVreg_PreserveVideoMemoryAllocations=1" > /etc/modprobe.d/nvidia-power.conf && \
