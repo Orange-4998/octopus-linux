@@ -55,6 +55,7 @@ RUN dnf -y install \
     
     # Compositor & UI Shell
     hyprland \
+    rofi \
     kitty \
     foot \
     waybar \
