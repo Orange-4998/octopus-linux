@@ -162,6 +162,10 @@ RUN echo "GBM_BACKEND=nvidia-drm" >> /etc/environment && \
     echo "ELECTRON_OZONE_PLATFORM_HINT=auto" >> /etc/environment
     # echo "WLR_DRM_NO_MODIFIERS=1" >> /etc/environment
 
+# Blacklist Nouveau
+RUN echo -e "blacklist nouveau\noptions nouveau modeset=0" > /etc/modprobe.d/blacklist-nouveau.conf && \
+    echo "options nvidia-drm modeset=1" > /etc/modprobe.d/nvidia.conf
+
 ## systemctl stuff
 RUN systemctl enable libvirtd.service
 
