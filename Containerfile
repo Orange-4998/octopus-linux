@@ -52,6 +52,7 @@ RUN dnf -y install \
     libvirt \
     virt-install \
     virt-manager \
+    distrobox \
     
     # Compositor & UI Shell
     hyprland \
