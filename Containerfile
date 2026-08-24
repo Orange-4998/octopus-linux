@@ -40,6 +40,7 @@ RUN dnf -y install \
 RUN dnf -y install \
     # System necessities
     vim \
+    git \
     neovim \
     emacs-nox \
     fdisk \
