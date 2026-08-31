@@ -43,7 +43,9 @@ RUN dnf -y install \
     NetworkManager-wifi \
     wpa_supplicant \
     # Wireless Hardware Firmware
-    iwlwifi-firmware \
+    iwlwifi-mvm-firmware \
+    iwlwifi-dvm-firmware \
+    iwlwifi-mld-firmware \
     realtek-firmware \
     atheros-firmware \
     brcmfmac-firmware \
