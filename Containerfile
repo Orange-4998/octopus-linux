@@ -38,6 +38,16 @@ RUN dnf -y install \
 
 
 RUN dnf -y install \
+    # Core Network Management
+    NetworkManager \
+    NetworkManager-wifi \
+    wpa_supplicant \
+    # Wireless Hardware Firmware
+    iwlwifi-firmware \
+    realtek-firmware \
+    atheros-firmware \
+    brcmfmac-firmware \
+
     # System necessities
     vim \
     git \
