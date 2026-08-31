@@ -73,7 +73,6 @@ RUN dnf -y install \
     foot \
     waybar \
     fish \
-    distrobox \
     ansible-core \
     clevis \
     clevis-dracut \
