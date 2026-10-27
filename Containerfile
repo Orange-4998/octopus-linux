@@ -204,8 +204,11 @@ RUN useradd -m -d /var/home/human -s /usr/bin/fish -G wheel,ansible-bot -u 1000 
 RUN mkdir -p /var/data && \
     chown human:human /var/data && \
     chown human:ansible-bot /var/home && \
-    chmod 2770 /var/home && \
+    chmod 2775 /var/home && \
     chmod 700 /var/data
+
+# Allocate rootless container UID/GID mapping ranges strictly for ansible-bot
+RUN usermod --add-subuids 100000-165535 --add-subgids 100000-165535 ansible-bot
 
 # ==========================================
 # 5. SYSTEM FISH SHELL ENTRY HOOK
