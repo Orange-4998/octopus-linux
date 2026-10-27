@@ -155,9 +155,18 @@ RUN echo 'WGKEY="/etc/pki/akmods/private/private.key"' >> /etc/sysconfig/akmods 
 # ==========================================
 
 # Force compile the open-source kernel modules during the image build stage
-RUN akmods --force --kernels $(rpm -q kernel --queryformat "%{VERSION}-%{RELEASE}.%{ARCH}\n" | tail -n 1)
-RUN dracut --regenerate-all --force
+# RUN akmods --force --kernels $(rpm -q kernel --queryformat "%{VERSION}-%{RELEASE}.%{ARCH}\n" | tail -n 1)
+# RUN dracut --regenerate-all --force
 
+# Ensure key readability for module signing
+RUN chown -R root:akmods /etc/pki/akmods/ && \
+    chmod 640 /etc/pki/akmods/private/private.key
+
+# Module compilation
+RUN KVER=$(rpm -q kernel --queryformat "%{VERSION}-%{RELEASE}.%{ARCH}\n" | tail -n 1) && \
+    akmods --force --kernels "$KVER"
+
+RUN dracut --regenerate-all --force
 
 # ==========================================
 # 2.4. ENSURING NVIDIA WORKS WITH HYPRLAND
