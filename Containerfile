@@ -203,9 +203,14 @@ RUN useradd -m -d /var/home/human -s /usr/bin/fish -G wheel,ansible-bot -u 1000 
 # Establish mounting layout directories before assigning immutable policies
 RUN mkdir -p /var/data && \
     chown human:human /var/data && \
-    chown human:ansible-bot /var/home && \
-    chmod 2775 /var/home && \
-    chmod 700 /var/data
+    chmod 700 /var/data && \
+    chmod 0755 /var/home
+# RUN mkdir -p /var/data && \
+#    chown human:human /var/data && \
+#    chown human:ansible-bot /var/home && \
+#    chmod 2775 /var/home && \
+#    chmod 700 /var/data
+
 
 # Allocate rootless container UID/GID mapping ranges strictly for ansible-bot
 RUN echo "ansible-bot:100000:65536" >> /etc/subuid && \
