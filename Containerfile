@@ -207,6 +207,10 @@ RUN mkdir -p /var/data && \
     chmod 2770 /var/home && \
     chmod 700 /var/data
 
+# Allocate rootless container UID/GID mapping ranges strictly for ansible-bot
+RUN echo "ansible-bot:100000:65536" >> /etc/subuid && \
+    echo "ansible-bot:100000:65536" >> /etc/subgid
+
 # ==========================================
 # 5. SYSTEM FISH SHELL ENTRY HOOK
 # ==========================================
