@@ -163,7 +163,7 @@ RUN chown -R root:akmods /etc/pki/akmods/ && \
     chmod 640 /etc/pki/akmods/private/private.key
 
 # Module compilation
-RUN akmods --force --kernels $(rpm -q kernel-devel --queryformat "%{VERSION}-%{RELEASE}.%{ARCH}\n" | tail -n 1)
+RUN akmods --force --kernels $(rpm -q kernel --queryformat "%{VERSION}-%{RELEASE}.%{ARCH}\n" | tail -n 1)
 
 RUN dracut --regenerate-all --force
 
