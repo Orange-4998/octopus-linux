@@ -159,8 +159,8 @@ RUN echo 'WGKEY="/etc/pki/akmods/private/private.key"' >> /etc/sysconfig/akmods 
 # RUN dracut --regenerate-all --force
 
 # Ensure key readability for module signing
-RUN chown -R root:akmods /etc/pki/akmods/ && \
-    chmod 640 /etc/pki/akmods/private/private.key
+RUN chown -R root:akmods /etc/pki/akmods/ # && \
+#    chmod 640 /etc/pki/akmods/private/private.key
 
 # Module compilation
 RUN akmods --force --kernels $(rpm -q kernel --queryformat "%{VERSION}-%{RELEASE}.%{ARCH}\n" | tail -n 1)
@@ -209,10 +209,10 @@ RUN useradd -m -d /var/home/human -s /usr/bin/fish -G wheel,ansible-bot -u 1000 
     echo "human:octopus" | chpasswd
 
 # Establish mounting layout directories before assigning immutable policies
-RUN mkdir -p /var/data && \
-    chown human:human /var/data && \
-    chmod 700 /var/data && \
-    chmod 0755 /var/home
+#RUN mkdir -p /var/data && \
+#    chown human:human /var/data && \
+#    chmod 700 /var/data && \
+#    chmod 0755 /var/home
 # RUN mkdir -p /var/data && \
 #    chown human:human /var/data && \
 #    chown human:ansible-bot /var/home && \
