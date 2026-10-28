@@ -24,31 +24,27 @@ jobs:
           sudo modprobe btrfs
           sudo lsmod | grep btrfs
 
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Log in to GitHub Container Registry for root Podman
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | sudo podman login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
 
-      # Step 1: Build & Push the OCI Container Image (Used for live bootc upgrades)
+      # Step 1: Build & Push the OCI Container Image using sudo
       - name: Build and push Container image
         run: |
           LOWER_IMAGE_NAME=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
           TAG="${{ env.REGISTRY }}/${LOWER_IMAGE_NAME}:latest"
           
-          # Build and push directly via podman
-          podman build -t $TAG -f ./Containerfile .
-          podman push $TAG
+          # Build and push directly via sudo podman so it lands in root storage (/var/lib/containers/storage)
+          sudo podman build -t $TAG -f ./Containerfile .
+          sudo podman push $TAG
           
           echo "FINAL_IMAGE_TAG=$TAG" >> $GITHUB_ENV
 
-      # Step 2: Convert the Container Image into a .raw Disk Image using Privileged Execution
+      # Step 2: Convert the Container Image into a .raw Disk Image
       - name: Build Raw Disk Image
         run: |
           mkdir -p ${{ github.workspace }}/output
           
-          # Run bootc-image-builder in a fully privileged container to bypass GHA sandbox restrictions
           sudo podman run \
             --rm \
             --privileged \
@@ -56,15 +52,15 @@ jobs:
             -v /var/lib/containers/storage:/var/lib/containers/storage \
             -v ${{ github.workspace }}/output:/output \
             -v ${{ github.workspace }}/config.toml:/config.toml:ro \
-            quay.io/centos-bootc/bootc-image-builder:latest \
+            quay.io/osbuild/image-builder:latest \
             build \
             --type raw \
             --target-arch x86_64 \
             --rootfs btrfs \
             --config /config.toml \
-            ${{ env.FINAL_IMAGE_TAG }}
+            --bootc-ref ${{ env.FINAL_IMAGE_TAG }}
 
-      # Step 3: Upload the built raw image so users can download it
+      # Step 3: Upload the built raw image
       - name: Upload Raw Disk Artifact
         uses: actions/upload-artifact@v4
         with:
