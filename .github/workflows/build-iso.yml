@@ -32,17 +32,15 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       # Step 1: Build & Push the OCI Container Image (Used for live bootc upgrades)
-      - name: Build and Push Container Image
+      - name: Build and push Container image
         run: |
-          # Safely downcase repository name
           LOWER_IMAGE_NAME=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
           TAG="${{ env.REGISTRY }}/${LOWER_IMAGE_NAME}:latest"
           
-          # Build the bootc OS container image
-          docker build -t $TAG -f ./Containerfile .
-          docker push $TAG
+          # Build and push directly via podman
+          podman build -t $TAG -f ./Containerfile .
+          podman push $TAG
           
-          # Pass tag to downstream steps
           echo "FINAL_IMAGE_TAG=$TAG" >> $GITHUB_ENV
 
       # Step 2: Convert the Container Image into a .raw Disk Image using Privileged Execution
