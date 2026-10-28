@@ -155,17 +155,9 @@ RUN echo 'WGKEY="/etc/pki/akmods/private/private.key"' >> /etc/sysconfig/akmods 
 # ==========================================
 
 # Force compile the open-source kernel modules during the image build stage
-# RUN akmods --force --kernels $(rpm -q kernel --queryformat "%{VERSION}-%{RELEASE}.%{ARCH}\n" | tail -n 1)
-# RUN dracut --regenerate-all --force
-
-# Ensure key readability for module signing
-RUN chown -R root:akmods /etc/pki/akmods/ # && \
-#    chmod 640 /etc/pki/akmods/private/private.key
-
-# Module compilation
 RUN akmods --force --kernels $(rpm -q kernel --queryformat "%{VERSION}-%{RELEASE}.%{ARCH}\n" | tail -n 1)
-
 RUN dracut --regenerate-all --force
+
 
 # ==========================================
 # 2.4. ENSURING NVIDIA WORKS WITH HYPRLAND
@@ -209,20 +201,11 @@ RUN useradd -m -d /var/home/human -s /usr/bin/fish -G wheel,ansible-bot -u 1000 
     echo "human:octopus" | chpasswd
 
 # Establish mounting layout directories before assigning immutable policies
-#RUN mkdir -p /var/data && \
-#    chown human:human /var/data && \
-#    chmod 700 /var/data && \
-#    chmod 0755 /var/home
-# RUN mkdir -p /var/data && \
-#    chown human:human /var/data && \
-#    chown human:ansible-bot /var/home && \
-#    chmod 2775 /var/home && \
-#    chmod 700 /var/data
-
-
-# Allocate rootless container UID/GID mapping ranges strictly for ansible-bot
-RUN echo "ansible-bot:100000:65536" >> /etc/subuid && \
-    echo "ansible-bot:100000:65536" >> /etc/subgid
+RUN mkdir -p /var/data && \
+    chown human:human /var/data && \
+    chown human:ansible-bot /var/home && \
+    chmod 2770 /var/home && \
+    chmod 700 /var/data
 
 # ==========================================
 # 5. SYSTEM FISH SHELL ENTRY HOOK
