@@ -42,19 +42,20 @@ jobs:
           
           echo "FINAL_IMAGE_TAG=$TAG" >> $GITHUB_ENV
 
-      # Step 2: Pull the image into Podman so image-builder-action can read it locally
+      # Step 2: Pull the image into Podman local storage for image-builder
       - name: Pull image into Podman local storage
         run: |
           sudo podman pull ${{ env.FINAL_IMAGE_TAG }}
 
-      # Step 3: Convert container to raw disk image using the unified image-builder-action
+      # Step 3: Convert container to raw disk image
       - name: Build Raw Disk Image
         uses: osbuild/image-builder-action@main
         with:
-          bootc-ref: ${{ env.FINAL_IMAGE_TAG }}
-          config-file: ./config.toml
-          types: raw
-          rootfs: btrfs
+          container-ref: ${{ env.FINAL_IMAGE_TAG }}
+          image-types: raw
+          distro: fedora-44
+          target-arch: x86_64
+          blueprint: ./config.toml
 
       # Step 4: Upload the output
       - name: Upload Raw Disk Artifact
