@@ -52,13 +52,12 @@ jobs:
             -v /var/lib/containers/storage:/var/lib/containers/storage \
             -v ${{ github.workspace }}/output:/output \
             -v ${{ github.workspace }}/config.toml:/config.toml:ro \
-            quay.io/osbuild/image-builder:latest \
-            build \
+            quay.io/centos-bootc/bootc-image-builder:latest \
             --type raw \
             --target-arch x86_64 \
             --rootfs btrfs \
             --config /config.toml \
-            --bootc-ref ${{ env.FINAL_IMAGE_TAG }}
+            ${{ env.FINAL_IMAGE_TAG }}
 
       # Step 3: Upload the built raw image
       - name: Upload Raw Disk Artifact
