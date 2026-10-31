@@ -69,6 +69,7 @@ RUN dnf -y install \
     
     # Compositor & UI Shell
     hyprland \
+    hyprshot \
     rofi \
     chezmoi \
     kitty \
