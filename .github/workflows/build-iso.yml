@@ -1,4 +1,4 @@
-name: Build Octopus Linux Raw Disk
+name: Build Octopus Linux Container
 
 on:
   push:
@@ -12,17 +12,12 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
       packages: write
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Load Btrfs Kernel Module
-        run: |
-          sudo modprobe btrfs
-          sudo lsmod | grep btrfs
 
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
@@ -31,35 +26,10 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # Step 1: Build & push container image using Docker
-      - name: Build and push Container image
+      - name: Build and push Container Image
         run: |
           LOWER_IMAGE_NAME=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
           TAG="${{ env.REGISTRY }}/${LOWER_IMAGE_NAME}:latest"
           
           docker build -t $TAG -f ./Containerfile .
           docker push $TAG
-          
-          echo "FINAL_IMAGE_TAG=$TAG" >> $GITHUB_ENV
-
-      # Step 2: Pull the image into Podman local storage for image-builder
-      - name: Pull image into Podman local storage
-        run: |
-          sudo podman pull ${{ env.FINAL_IMAGE_TAG }}
-
-      # Step 3: Convert container to raw disk image
-      - name: Build Raw Disk Image
-        uses: osbuild/image-builder-action@main
-        with:
-          container-ref: ${{ env.FINAL_IMAGE_TAG }}
-          image-types: raw
-          distro: fedora-44
-          target-arch: x86_64
-          blueprint: ./config.toml
-
-      # Step 4: Upload the output
-      - name: Upload Raw Disk Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: octopus-linux-raw-disk
-          path: ${{ github.workspace }}/output/image/disk.raw

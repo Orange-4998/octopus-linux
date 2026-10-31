@@ -51,7 +51,6 @@ RUN dnf -y install \
     brcmfmac-firmware \
 
     # System necessities
-    vim \
     git \
     neovim \
     emacs-nox \
@@ -59,6 +58,11 @@ RUN dnf -y install \
     testdisk \
     ranger \
     w3m \
+
+    # Temporary stuff
+    xournalpp \
+    firefox \
+    wl-clipboard \
     
     # Virtualization
     qemu-kvm \
