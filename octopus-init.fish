@@ -16,7 +16,7 @@ if test (tty) = "/dev/tty1"; and test "$USER" = "human"
         # 1. Decrypt and Mount Home Space
         if not test -d /var/home/human/.config
             sudo cryptsetup open /dev/disk/by-partlabel/octopus-HOME luks-home
-            sudo mount /dev/mapper/luks-home /var/home/human
+            sudo mount /dev/mapper/luks-home /var/home
         end
 
         # 2. Decrypt and Mount Shuttle Data Space
@@ -26,7 +26,7 @@ if test (tty) = "/dev/tty1"; and test "$USER" = "human"
         end
 
         echo "[*] Launching Hyprland matrix..."
-        exec Hyprland
+        start-hyprland
     else
         echo "[*] Remaining in raw CLI mode. Type 'exec Hyprland' manually when ready."
     end
