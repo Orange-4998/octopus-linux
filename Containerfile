@@ -88,9 +88,21 @@ RUN dnf -y install \
 # fonts
 RUN dnf install -y \
     fontconfig \
-    dejavu-sans-mono-fonts \
-    liberation-mono-fonts \
-    google-noto-sans-fonts && \
+    # Official Fedora Metapackages (No wildcards)
+    default-fonts-core \
+    default-fonts-core-math \
+    # Web Math Rendering (Desmos, MathJax, LaTeX)
+    mathjax-math-fonts \
+    stix-fonts \
+    # Standard TeX / Computer Modern Fonts
+    texlive-cm \
+    texlive-cm-super \
+    texlive-lm \
+    texlive-latex-fonts \
+    gnu-free-sans-fonts \
+    gnu-free-serif-fonts \
+    gnu-free-mono-fonts \
+    urw-base35-fonts && \
     fc-cache -fv
 
 # ========================================
