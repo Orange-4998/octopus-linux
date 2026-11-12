@@ -220,13 +220,27 @@ RUN useradd -m -d /var/home/human -s /usr/bin/fish -G wheel,ansible-bot -u 1000 
 # Establish mounting layout directories before assigning immutable policies
 RUN mkdir -p /var/data && \
     chown human:human /var/data && \
-    chown human:ansible-bot /var/home && \
-    chmod 2770 /var/home && \
-    chmod 700 /var/data
+    chmod 755 /var/home && \
+    chmod 700 /var/data &&
+    setfacl -R -m u:ansible-bot:rwx /var/home && \
+    setfacl -R -d -m u:ansible-bot:rwx /var/home
 
 # Allocate rootless container UID/GID mapping ranges strictly for ansible-bot
 RUN echo "ansible-bot:100000:65536" >> /etc/subuid && \
     echo "ansible-bot:100000:65536" >> /etc/subgid
+
+# Add polkit rules to let human machinectl into ansible-bot`
+RUN mkdir -p /etc/polkit-1/rules.d && \
+    cat << 'EOF' > /etc/polkit-1/rules.d/50-ansible-bot-shell.rules
+polkit.addRule(function(action, subject) {
+    if ((action.id == "org.freedesktop.machine1.host-shell" ||
+         action.id == "org.freedesktop.machine1.host-login") &&
+        action.lookup("user") == "ansible-bot" &&
+        subject.user == "human") {
+        return polkit.Result.YES;
+    }
+});
+EOF
 
 # ==========================================
 # 5. SYSTEM FISH SHELL ENTRY HOOK
